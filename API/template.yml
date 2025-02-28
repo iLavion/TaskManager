@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  TaskManagerAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+      Cors:
+        AllowMethods: '''GET,POST,OPTIONS'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization'''
+        AllowOrigin: '''*'''
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: TaskManagerAPI
+          version: '1.0'
+        paths:
+          /:
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GlobalEstateAPI.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+              responses: {}
+          /graphql:
+            post:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GlobalEstateAPI.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+              responses: {}
+            options:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GlobalEstateAPI.Arn}/invocations
+                httpMethod: POST
+                type: aws_proxy
+              responses: {}
+
+  TaskManagerAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main.handler
+      Runtime: nodejs20.x
+      MemorySize: 2048
+      Timeout: 60
+      Environment:
+        Variables:
+          NODE_ENV: !Ref NodeEnv
+          BUCKET_NAME: !Ref BucketName
+          BUCKET_REGION: !Ref BucketRegion
+          BUCKET_ENDPOINT: !Ref BucketEndpoint
+          BUCKET_ACCESS_KEY_ID: !Ref BucketAccessKeyId
+          BUCKET_SECRET_ACCESS_KEY: !Ref BucketSecretAccessKey
+          DYNAMODB_REGION: !Ref DynamoDbRegion
+          DYNAMODB_ENDPOINT: !Ref DynamoDbEndpoint
+          DYNAMODB_ACCESS_KEY_ID: !Ref DynamoDbAccessKeyId
+          DYNAMODB_SECRET_ACCESS_KEY: !Ref DynamoDbSecretAccessKey
+      Events:
+        RootGet:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref TaskManagerAPIGateway
+        GraphQLPost:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: POST
+            RestApiId: !Ref TaskManagerAPIGateway
+        GraphQLOptions:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: OPTIONS
+            RestApiId: !Ref TaskManagerAPIGateway
+      Policies:
+        - S3ReadPolicy:
+            BucketName: media.taskmanager
+        - S3WritePolicy:
+            BucketName: media.taskmanager
+
+Parameters:
+  
+  # Node environment
+  NodeEnv:
+    Type: String
+    Default: development
+
+  # CORS Origin header value
+  AllowOrigin:
+    Type: String
+    Default: '*'
+    AllowedValues:
+      - '*'
+      - 'https://example.com'
+  
+  # Google ReCAPTCHA
+  ReCAPTCHAv2:
+    Type: String
+    Default: 'example'
+  ReCAPTCHAv3:
+    Type: String
+    Default: 'example'
+  
+  # S3 bucket
+  BucketName:
+    Type: String
+    Default: media.taskmanager
+  BucketRegion:
+    Type: String
+    Default: eu-north-1
+  BucketEndpoint:
+    Type: String
+    Default: http://localhost:4566
+  BucketAccessKeyId:
+    Type: String
+    Default: localstack-id
+  BucketSecretAccessKey:
+    Type: String
+    Default: localstack-key
+
+  # DynamoDB
+  DynamoDbRegion:
+    Type: String
+    Default: eu-north-1
+  DynamoDbEndpoint:
+    Type: String
+    Default: http://localhost:4566
+  DynamoDbAccessKeyId:
+    Type: String
+    Default: localstack-id
+  DynamoDbSecretAccessKey:
+    Type: String
+    Default: localstack-key

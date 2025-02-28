@@ -1,0 +1,23 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "TaskManagerAPI"
+resolve_s3 = true
+s3_bucket = "TaskManagerAPI-Bucket"
+region = "eu-north-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []
+parameter_overrides = """
+    NodeEnv                 = production \
+    AllowOrigin             = https://example.com \
+    BucketName              = media.taskmanager \
+    BucketRegion            = eu-north-1 \
+    BucketEndpoint          = https://s3.eu-north-1.amazonaws.com \
+    BucketAccessKeyId       = access-key-id \
+    BucketSecretAccessKey   = secret-access-key \
+    DynamoDbRegion          = eu-north-1 \
+    DynamoDbEndpoint        = https://dynamodb.eu-north-1.amazonaws.com \
+    DynamoDbAccessKeyId     = access-key-id \
+    DynamoDbSecretAccessKey = secret-access-key
+"""
