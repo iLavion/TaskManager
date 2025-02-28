@@ -12,3 +12,6 @@ dist/
 
 # GitHub 
 .github/
+
+# AWS SAM
+.aws-sam/
