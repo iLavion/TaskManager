@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start:api": "cd API && npm run dev",
+    "start:web": "cd Web && npm run dev",
+    "start:full": "npm run start:api & npm run start:web"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

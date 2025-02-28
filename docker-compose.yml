@@ -1,0 +1,13 @@
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: TaskManager_Localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3
+      - AWS_ACCESS_KEY_ID=localstack-id
+      - AWS_SECRET_ACCESS_KEY=localstack-key
+      - HOSTNAME_EXTERNAL=localhost
+    volumes:
+      - "./TaskManagerData:/var/lib/localstack"

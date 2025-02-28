@@ -1,0 +1,14 @@
+# Localstack Data
+TaskManagerData/
+
+# Visual Studio
+.vs
+
+# Node Modules
+node_modules/
+
+# Build output
+dist/
+
+# GitHub 
+.github/
